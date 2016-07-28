@@ -63,13 +63,13 @@ public class MyMediaStreamActionNotify3 implements IMediaStreamActionNotify3 {
 		Quote result = restTemplate.postForObject( uri, newQuote, Quote.class);
 		*/
 		
-		Form form = new Form();
-		form.param("x", "foo");
-		form.param("y", "bar");
+		//Form form = new Form();
+		//form.param("stream", stream.getName());
+		//form.param("time", now.toString());
 
 		Client client = ClientBuilder.newClient();
 
-		WebTarget resource = client.target("http://localhost:8080/someresource");
+		WebTarget resource = client.target("http://localhost:5000/api/stream");
 
 		Builder request = resource.request();
 		request.accept(MediaType.APPLICATION_JSON);
