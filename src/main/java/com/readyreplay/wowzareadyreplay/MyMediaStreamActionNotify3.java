@@ -2,11 +2,6 @@ package com.readyreplay.wowzareadyreplay;
 
 import java.util.Date;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.client.RestTemplate;
-
 import com.wowza.wms.amf.AMFPacket;
 import com.wowza.wms.logging.WMSLoggerFactory;
 import com.wowza.wms.media.model.MediaCodecInfoAudio;
@@ -14,7 +9,14 @@ import com.wowza.wms.media.model.MediaCodecInfoVideo;
 import com.wowza.wms.stream.IMediaStream;
 import com.wowza.wms.stream.IMediaStreamActionNotify3;
 
-// @SpringBootApplication
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.client.Invocation;
+
 public class MyMediaStreamActionNotify3 implements IMediaStreamActionNotify3 {
 
 	@Override
@@ -42,10 +44,27 @@ public class MyMediaStreamActionNotify3 implements IMediaStreamActionNotify3 {
 		// Post to RR replay server the time in the stream
 		Date now = new Date();
 		 
-		RestTemplate restTemplate = new RestTemplate();
-                // Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
-		// WMSLoggerFactory.getLogger(null).info("onPublish: " + quote.toString());
-		 
+		Client client = ClientBuilder.newClient();
+
+		WebTarget resource = client.target("http://localhost:5000/api/stream");
+
+		Invocation.Builder request = resource.request();
+		request.accept(MediaType.APPLICATION_JSON);
+
+		Response response = request.get();
+
+		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
+			WMSLoggerFactory.getLogger(null).info("onPublish: Success! " + response.getStatus());
+			WMSLoggerFactory.getLogger(null).info("onPublish: " + response.getEntity());
+		    //System.out.println("Success! " + response.getStatus());
+		    //System.out.println(response.getEntity());
+		} else {
+			WMSLoggerFactory.getLogger(null).info("onPublish: ERROR! " + response.getStatus());
+			WMSLoggerFactory.getLogger(null).info("onPublish: " + response.getEntity());
+		    //System.out.println("ERROR! " + response.getStatus());    
+		    //System.out.println(response.getEntity());
+		}
+		
 		WMSLoggerFactory.getLogger(null).info("onPublish: " + now);
 	}
 
