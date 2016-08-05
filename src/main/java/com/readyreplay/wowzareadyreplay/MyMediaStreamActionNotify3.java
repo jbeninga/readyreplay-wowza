@@ -40,10 +40,13 @@ public class MyMediaStreamActionNotify3 implements IMediaStreamActionNotify3 {
 	@Override
 	public void onPublish(IMediaStream stream, String streamName, boolean isRecord, boolean isAppend)
 	{
-		WMSLoggerFactory.getLogger(null).info("onPublish: " + stream.getName());
 		// Post to RR replay server the time in the stream
 		Date now = new Date();
+		
+		String input = "{\"stream\":\"" + stream.getName() + "\",\"time\":\"" + now.getTime() + "\"}";
 		 
+		WMSLoggerFactory.getLogger(null).info("onPublish: " + input);
+
 		Client client = ClientBuilder.newClient();
 
 		WebTarget resource = client.target("http://localhost:5000/api/stream");
@@ -51,11 +54,12 @@ public class MyMediaStreamActionNotify3 implements IMediaStreamActionNotify3 {
 		Invocation.Builder request = resource.request();
 		request.accept(MediaType.APPLICATION_JSON);
 
+//		Response response = request.post(Response.class, input);
 		Response response = request.get();
 
 		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
 			WMSLoggerFactory.getLogger(null).info("onPublish: Success! " + response.getStatus());
-			WMSLoggerFactory.getLogger(null).info("onPublish: " + response.getEntity());
+			WMSLoggerFactory.getLogger(null).info("onPublish: " + response.readEntity(String.class));
 		    //System.out.println("Success! " + response.getStatus());
 		    //System.out.println(response.getEntity());
 		} else {
